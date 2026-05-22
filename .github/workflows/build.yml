@@ -3,6 +3,9 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      _JAVA_OPTIONS: "-Xmx4g"
+      GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2"
     steps:
       - uses: actions/checkout@v4
 
@@ -29,13 +32,12 @@ jobs:
 
       - name: Gerar Estrutura Android
         run: npx expo prebuild --platform android
-        
 
       - name: Compilar APK de Depuração
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Enviar APK de Aniversário
         uses: actions/upload-artifact@v4
