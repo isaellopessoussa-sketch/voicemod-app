@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "VoiceMod",
+    "slug": "voicemod-app",
+    "version": "1.0.0",
+    "android": {
+      "package": "com.meuapp.voicemod",
+      "permissions": ["RECORD_AUDIO"]
+    }
+  }
+}
