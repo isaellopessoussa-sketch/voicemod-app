@@ -15,27 +15,28 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Instalar Dependencias
+      - name: Criar Imagens Falsas para o Expo
         run: |
-          npm install
-          npm install -g react-native-cli
+          mkdir -p assets
+          echo "" > assets/icon.png
+          echo "" > assets/splash.png
+          echo "" > assets/adaptive-icon.png
+          echo "" > assets/favicon.png
 
-      - name: Gerar Pastas do Android
-        run: npx expo prebuild --platform android --template blank || true
+      - name: Instalar Dependências
+        run: npm install
 
-      - name: Forçar Criação do Bundle
-        run: |
-          mkdir -p android/app/src/main/assets
-          npx react-native bundle --platform android --dev false --entry-file App.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res --config metro.config.js || true
+      - name: Gerar Estrutura Android
+        run: npx expo prebuild --platform android --no-interactive
 
-      - name: Compilar APK
+      - name: Compilar APK de Depuração
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease || ./gradlew assembleDebug
+          ./gradlew assembleDebug
 
-      - name: Enviar APK Pronto
+      - name: Enviar APK de Aniversário
         uses: actions/upload-artifact@v4
         with:
-          name: AppModificador
-          path: android/app/build/outputs/apk/**/app-*.apk
+          name: SeuApkDeAniversario
+          path: android/app/build/outputs/apk/debug/app-debug.apk
