@@ -1,13 +1,28 @@
 {
   "expo": {
-    "name": "VoiceMod",
+    "name": "voicemod-app",
     "slug": "voicemod-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
     "android": {
-      "package": "com.meuapp.voicemod",
-      "permissions": ["RECORD_AUDIO"]
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.isaellopessoussa.voicemodapp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
   }
 }
