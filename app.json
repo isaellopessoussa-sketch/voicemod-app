@@ -3,6 +3,8 @@
     "name": "VoiceMod",
     "slug": "voicemod-app",
     "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
     "android": {
       "package": "com.meuapp.voicemod",
       "permissions": ["RECORD_AUDIO"]
