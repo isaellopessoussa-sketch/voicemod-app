@@ -18,10 +18,11 @@ jobs:
       - name: Criar Imagens Falsas para o Expo
         run: |
           mkdir -p assets
-          curl -s -o assets/icon.png https://raw.githubusercontent.com/expo/expo/main/templates/expo-template-blank/assets/icon.png
-          curl -s -o assets/splash.png https://raw.githubusercontent.com/expo/expo/main/templates/expo-template-blank/assets/splash.png
-          curl -s -o assets/adaptive-icon.png https://raw.githubusercontent.com/expo/expo/main/templates/expo-template-blank/assets/icon.png
-          curl -s -o assets/favicon.png https://raw.githubusercontent.com/expo/expo/main/templates/expo-template-blank/assets/favicon.png
+          sudo apt-get update && sudo apt-get install -y imagemagick
+          convert -size 512x512 xc:blue assets/icon.png
+          convert -size 512x512 xc:blue assets/adaptive-icon.png
+          convert -size 1242x2436 xc:blue assets/splash.png
+          convert -size 64x64 xc:blue assets/favicon.png
 
       - name: Instalar Dependências
         run: npm install
