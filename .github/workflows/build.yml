@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       _JAVA_OPTIONS: "-Xmx4g"
-      GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2"
+      GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2 -Dorg.gradle.parallel=false"
     steps:
       - uses: actions/checkout@v4
 
@@ -18,40 +18,36 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Criar Imagens e Pastas do Zero
+      - name: Instalar Ferramentas de Imagem
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
+      - name: Forçar Criação das Imagens Nativas
         run: |
           mkdir -p assets
-          sudo apt-get update && sudo apt-get install -y imagemagick
           convert -size 512x512 xc:blue assets/icon.png
           convert -size 512x512 xc:blue assets/adaptive-icon.png
+          convert -size 1242x2436 xc:blue assets/splash.png
           convert -size 64x64 xc:blue assets/favicon.png
-          mkdir -p android/app/src/main/assets
 
       - name: Instalar Dependências
-        run: |
-          npm install
-          npm install -g react-native-cli
+        run: npm install
 
-      - name: Forçar Criação do Android Limpo
-        run: npx expo prebuild --platform android --clean
+      - name: Gerar Pastas Android do Expo
+        run: npx expo prebuild --platform android
 
-      - name: Gerar Bundle do Código
-        run: npx react-native bundle --platform android --dev false --entry-file App.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res || true
-
-      - name: Injetar Super Memória Direto no Android
+      - name: Injetar Configurações de Memória do Sistema
         run: |
           echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> android/gradle.properties
           echo "android.enableJetifier=true" >> android/gradle.properties
 
-      - name: Compilar APK Sem Parar por Erro
+      - name: Compilar APK Direto pelo Expo
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew clean
-          ./gradlew assembleDebug --no-daemon || ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleDebug --no-daemon
 
-      - name: Enviar APK Pronto Para o Dono
+      - name: Enviar APK para o Celular
         uses: actions/upload-artifact@v4
         with:
-          name: SeuApkDeAniversario
-          path: android/app/build/outputs/apk/**/*.apk
+          name: AppVoiceModPronto
+          path: android/app/build/outputs/apk/debug/app-debug.apk
