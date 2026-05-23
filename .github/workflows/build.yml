@@ -33,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Gerar Pastas Android do Expo
-        run: npx expo prebuild --platform android
+        run: npx expo prebuild --platform android --clean
 
       - name: Injetar Configurações de Memória do Sistema
         run: |
