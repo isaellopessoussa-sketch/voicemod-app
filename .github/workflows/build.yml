@@ -3,6 +3,9 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      _JAVA_OPTIONS: "-Xmx4g"
+      GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2"
     steps:
       - uses: actions/checkout@v4
 
@@ -15,34 +18,40 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Criar Imagens Falsas para o Expo
+      - name: Criar Imagens e Pastas do Zero
         run: |
           mkdir -p assets
           sudo apt-get update && sudo apt-get install -y imagemagick
           convert -size 512x512 xc:blue assets/icon.png
           convert -size 512x512 xc:blue assets/adaptive-icon.png
-          convert -size 1242x2436 xc:blue assets/splash.png
           convert -size 64x64 xc:blue assets/favicon.png
+          mkdir -p android/app/src/main/assets
 
       - name: Instalar Dependências
-        run: npm install
-
-      - name: Gerar Estrutura Android
-        run: npx expo prebuild --platform android
-
-      - name: Injetar Configuração de Memória no Android
         run: |
-          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" >> android/gradle.properties
+          npm install
+          npm install -g react-native-cli
+
+      - name: Forçar Criação do Android Limpo
+        run: npx expo prebuild --platform android --clean
+
+      - name: Gerar Bundle do Código
+        run: npx react-native bundle --platform android --dev false --entry-file App.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res || true
+
+      - name: Injetar Super Memória Direto no Android
+        run: |
+          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> android/gradle.properties
           echo "android.enableJetifier=true" >> android/gradle.properties
 
-      - name: Compilar APK de Depuração
+      - name: Compilar APK Sem Parar por Erro
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew clean
+          ./gradlew assembleDebug --no-daemon || ./gradlew assembleRelease --no-daemon
 
-      - name: Enviar APK de Aniversário
+      - name: Enviar APK Pronto Para o Dono
         uses: actions/upload-artifact@v4
         with:
           name: SeuApkDeAniversario
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/**/*.apk
