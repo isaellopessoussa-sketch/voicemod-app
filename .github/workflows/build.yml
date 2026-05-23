@@ -18,12 +18,17 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Deletar Pastas Antigas e Criar Assets
+        run: |
+          rm -rf android
+          rm -rf ios
+          mkdir -p assets
+
       - name: Instalar Ferramentas de Imagem
         run: sudo apt-get update && sudo apt-get install -y imagemagick
 
       - name: Forçar Criação das Imagens Nativas
         run: |
-          mkdir -p assets
           convert -size 512x512 xc:blue assets/icon.png
           convert -size 512x512 xc:blue assets/adaptive-icon.png
           convert -size 1242x2436 xc:blue assets/splash.png
@@ -32,7 +37,7 @@ jobs:
       - name: Instalar Dependências
         run: npm install
 
-      - name: Gerar Pastas Android do Expo
+      - name: Gerar Pastas Android do Expo do Zero
         run: npx expo prebuild --platform android --clean
 
       - name: Injetar Configurações de Memória do Sistema
